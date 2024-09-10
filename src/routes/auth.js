@@ -4,6 +4,7 @@ const router = express.Router();
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { connectToDatabase } = require('../helpers/dbHelper');
 
 const users = [
   {
@@ -27,10 +28,10 @@ router.post('/register', async (req, res) => {
   try {
     const { username, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
-    
-    // const user = new User({ username, password: hashedPassword });
-    // await user.save();
-    res.status(201).json({ hashedPassword, message: 'User registered successfully' });
+    const db = await connectToDatabase();
+    const user = db.collection('users');
+    await user.insertOne({ username, password: hashedPassword });
+    res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Registration failed' });
   }
@@ -40,15 +41,17 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
-    // const user = await User.findOne({ username });
-    const user = users.find(user => user.name === username);
-    console.log('uname', req.body);
+    const db = await connectToDatabase();
+    const usersCollection = db.collection('users');
+    const user = await usersCollection.findOne({ username });
+    console.log('user', user);
     
-
     if (!user) {
       return res.status(401).json({ error: 'Authentication failed' });
     }
     const passwordMatch = await bcrypt.compare(password, user.password);
+    console.log('user.password', user.password);
+    
     if (!passwordMatch) {
       return res.status(401).json({ error: 'Authentication failed' });
     }

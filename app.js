@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 3000;
 app.get('/', async (req, res) => {
   try {
       const db = await connectToDatabase();
-      const collection = db.collection('myCollection'); // Replace with your collection name
+      const collection = db.collection('users'); // Replace with your collection name
       const data = await collection.find().toArray();
       res.json(data);
   } catch (err) {

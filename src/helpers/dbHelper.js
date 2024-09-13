@@ -9,7 +9,6 @@ const connectToDatabase = async () => {
         if (db) return db; // Return the existing connection if already connected
         
         await client.connect();
-        console.log('Connected to MongoDB');
         
         db = client.db('plantastic');
         return db;

@@ -10,13 +10,17 @@ const PORT = process.env.PORT || 3000;
 
 app.get('/', async (req, res) => {
   try {
-      const db = await connectToDatabase();
-      const collection = db.collection('users'); // Replace with your collection name
-      const data = await collection.find().toArray();
-      res.json(data);
+    const db = await connectToDatabase();      
+    if (db){
+      res.redirect('/api/health');
+    }
   } catch (err) {
       res.status(500).send('Error fetching data from MongoDB');
   }
+});
+
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'healthy', message: "Connected to MongoDB" });
 });
 
 app.listen(PORT, () => {

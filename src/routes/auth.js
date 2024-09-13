@@ -5,26 +5,10 @@ const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { connectToDatabase } = require('../helpers/dbHelper');
+const { userRegistrationValidator, validate } = require('../validators/validatorMiddleware');
 
-const users = [
-  {
-    id: 1,
-    name: "Juan",
-    password: "$2b$10$CXOz6PdY0h1q3FeeU8Vgje3.6N3yDCuXc8/MNSbfkrfo.X5W8GQl6"
-  },
-  {
-    id: 2,
-    name: "Pedro",
-    password: "$2b$10$/Ok0VoifxDNxA2beFp/igeVdX/j1qVsMVdKBcgHxLx5jOOGkGWOay"
-  },
-  {
-    id: 7,
-    name: "Tom",
-    password: "$2b$10$4CCCo4rZwr6U4rK/bF4X3uQKq4N.jmr1AhwHjvvI085R2yxjuUv92"
-  }
-];
 // User registration
-router.post('/register', async (req, res) => {
+router.post('/register', userRegistrationValidator(), validate, async (req, res) => {
   try {
     const { username, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
